@@ -20,7 +20,7 @@ struct Node *criarNo(int valor)
   if (novoNo == NULL)
   {
     printf("Erro ao alocar o Nó\n\n");
-    return 1;
+    exit(-1);
   }
   novoNo->valor = valor;
   novoNo->direita = NULL;
