@@ -1,23 +1,43 @@
-/* 
+/*
 Aluno: Vinícius Frigulha Ribeiro
 CC6N - Estrutura de Dados II
-GitHub: vinifrigulha
+GitHub:
+https://github.com/vinifrigulha/Estrutura_Dados_II/tree/main/Meus_Codigos_VFR
 */
 
+// -=-=-=-=-=- BIBLIOTECAS -=-=-=-=-=-
 #include <stdio.h>
 #include <stdlib.h>
 
-struct Node
-{
+// -=-=-=-=-=- ESTRUTURAS -=-=-=-=-=-
+struct Node {
   int valor;
   struct Node *esquerda;
   struct Node *direita;
 };
 
-struct Node *criarNo(int valor)
-{
+// -=-=-=-=-=- FUNÇÕES AUXILIARES -=-=-=-=-=-
+// Função auxiliar para encontrar um valor mínimo entre os nós de uma raiz
+struct Node *encontrarMinimo(struct Node *raiz) {
+  struct Node *atual = raiz;
+  while (atual->esquerda != NULL) {
+    atual = atual->esquerda;
+  }
+  return atual;
+}
+
+// Função auxiliar para exbir a árvore
+void exibirArvore(struct Node *raiz) {
+  exibirArvore(raiz->esquerda);
+  printf("\n%i", raiz->valor);
+  exibirArvore(raiz->direita);
+}
+
+// -=-=-=-=-=- FUNÇÕES DO PROGRAMA -=-=-=-=-=-
+// Função para criar um novo Nó
+struct Node *criarNo(int valor) {
   struct Node *novoNo = (struct Node *)malloc(sizeof(struct Node));
-  if (novoNo == NULL)
+  if (novoNo == NULL) // Verificando se a raiz é NULL
   {
     printf("Erro ao alocar o Nó\n\n");
     exit(-1);
@@ -28,46 +48,34 @@ struct Node *criarNo(int valor)
   return novoNo;
 }
 
-struct Node *inserirNo(struct Node *raiz, int valor)
-{
-  if (raiz == NULL)
+// Função para inserir um novo Nó
+struct Node *inserirNo(struct Node *raiz, int valor) {
+  if (raiz == NULL) // Verificando se a raiz é NULL
   {
     return criarNo(valor);
-  }
-  else 
-  {
-    if (valor <= raiz->valor)
-    {
+  } else {
+    if (valor <= raiz->valor) {
       raiz->esquerda = inserirNo(raiz->esquerda, valor);
-    }
-    else
-    {
+    } else {
       raiz->direita = inserirNo(raiz->direita, valor);
     }
   }
   return raiz;
 }
 
-void procurarNo(struct Node *raiz, int valor)
-{
-  if (raiz == NULL)
+// Função para procurar um Nó
+void procurarNo(struct Node *raiz, int valor) {
+  if (raiz == NULL) // Verificando se a raiz é NULL
   {
     printf("Elemento %d não encontrado.\n\n", valor);
     return;
-  }
-  else
-  {
-    if (valor == raiz->valor)
-    {
+  } else {
+    if (valor == raiz->valor) {
       printf("O valor %d foi encontrado!\n\n", valor);
-    }
-    else if (valor < raiz->valor)
-    {
+    } else if (valor < raiz->valor) {
       printf("O valor %d é menor que %d\n", valor, raiz->valor);
       procurarNo(raiz->esquerda, valor);
-    }
-    else if (valor > raiz->valor)
-    {
+    } else if (valor > raiz->valor) {
       printf("O valor %d é maior que %d\n", valor, raiz->valor);
       procurarNo(raiz->direita, valor);
     }
@@ -75,46 +83,25 @@ void procurarNo(struct Node *raiz, int valor)
   }
 }
 
-struct Node *encontrarMinimo(struct Node *raiz)
-{
-  struct Node *atual = raiz;
-  while (atual->esquerda != NULL)
-  {
-    atual = atual->esquerda;
-  }
-  return atual;
-}
-
-struct Node *excluirNo(struct Node *raiz, int valor)
-{
-  if (raiz == NULL)
-  {
+// Função para excluir um Nó
+struct Node *excluirNo(struct Node *raiz, int valor) {
+  if (raiz == NULL) {
     printf("Elemento %d não encontrado\n\n", valor);
     return raiz;
   }
-  if (valor < raiz->valor)
-  {
+  if (valor < raiz->valor) {
     raiz->esquerda = excluirNo(raiz->esquerda, valor);
-  }
-  else if (valor > raiz->valor)
-  {
+  } else if (valor > raiz->valor) {
     raiz->direita = excluirNo(raiz->direita, valor);
-  }
-  else
-  {
+  } else {
     // 1º Caso: Nó folha ou nó com um filho
-    if (raiz->esquerda == NULL)
-    {
+    if (raiz->esquerda == NULL) {
       struct Node *temp = raiz->direita;
-      free(raiz);
       printf("Elemento %d excluído\n\n", valor);
       return temp;
-    }
-    else if (raiz->direita == NULL)
-    {
+    } else if (raiz->direita == NULL) {
       struct Node *temp = raiz->esquerda;
       printf("Elemento %d excluído\n\n", valor);
-      free(raiz);
       return temp;
     }
 
@@ -127,25 +114,64 @@ struct Node *excluirNo(struct Node *raiz, int valor)
   return raiz;
 }
 
-int main()
-{
+// -=-=-=-=-=- PROGRAMA PRINCIPAL -=-=-=-=-=-
+int main() {
   struct Node *raiz = NULL;
 
-  raiz = inserirNo(raiz, 3);
-  raiz = inserirNo(raiz, 2);
-  raiz = inserirNo(raiz, 1);
-  raiz = inserirNo(raiz, 6);
-  raiz = inserirNo(raiz, 5);
-  raiz = inserirNo(raiz, 4);
+  int n = 0;
+  printf("Digite a quantidade de nós a serem adicionados: ");
+  scanf("%i", &n);
 
-  printf("BORA PROCURAR ESSA PESTE\n");
-  procurarNo(raiz, 7);
+  while (n > 0) {
+    int num = 0;
+    printf("Digite um valor: ");
+    scanf("%i", &num);
+    raiz = inserirNo(raiz, num);
+    n--;
+  }
 
-  printf("BORA EXCLUIR ESSA PESTE\n");
-  excluirNo(raiz, 4);
+  int opcao = -1;
+  int valor;
+  while (opcao != 0) {
+    printf("\n-=-=-=-=-=- MENU -=-=-=-=-=-=-");
+    printf("\n\n[1] Procurar um elemento na árvore");
+    printf("\n[2] Excluir um elemento da árvore");
+    printf("\n[3] Exibir a árvore");
+    printf("\n\n[0] Sair do programa");
+    printf("\nDigite a sua opção: ");
+    scanf("%i", &opcao);
 
-  printf("BORA PROCURAR ESSA PESTE\n");
-  procurarNo(raiz, 3);
-  
+    switch (opcao) {
+    case 1:
+      printf("\n-=-=-=-=-=- PROCURAR NÓ -=-=-=-=-=-");
+      printf("\nDigite um valor a ser procurado: ");
+      scanf("%i", &valor);
+      procurarNo(raiz, valor);
+      break;
+
+    case 2:
+      printf("\n-=-=-=-=-=- EXCLUIR NÓ -=-=-=-=-=-");
+      printf("\nDigite um valor a ser excluído: ");
+      scanf("%i", &valor);
+      raiz = excluirNo(raiz, valor);
+      break;
+
+    case 3:
+      printf("\n-=-=-=-=-=- EXIBIR ÁRVORE -=-=-=-=-=-");
+      exibirArvore(raiz);
+      break;
+
+    case 0:
+      printf("\n-=-=-=-=-=- SAIR DO PROGRAMA -=-=-=-=-=-");
+      printf("\nAté mais!!");
+      break;
+
+    default:
+      printf("\nValor Inválido. Tente novamente.");
+      opcao = -1;
+      break;
+    }
+  }
+
   return 0;
 }
