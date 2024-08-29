@@ -26,11 +26,54 @@ struct Node *encontrarMinimo(struct Node *raiz) {
   return atual;
 }
 
-// Função auxiliar para exbir a árvore
-void exibirArvore(struct Node *raiz) {
-  exibirArvore(raiz->esquerda);
-  printf("\n%i", raiz->valor);
-  exibirArvore(raiz->direita);
+// Função auxiliar para exibir a árvore PRE-ORDER:
+void preOrder(struct Node *raiz) {
+  if (raiz != NULL) {
+    printf("%i ", raiz->valor);
+    preOrder(raiz->esquerda);
+    preOrder(raiz->direita);
+  }
+}
+
+// Função auxiliar para exibir a árvore IN-ORDER:
+void inOrder(struct Node *raiz) {
+  if (raiz != NULL) {
+    inOrder(raiz->esquerda);
+    printf("%i ", raiz->valor);
+    inOrder(raiz->direita);
+  }
+}
+
+// Função auxiliar para exibir a árvore POS-ORDER:
+void posOrder(struct Node *raiz) {
+  if (raiz != NULL) {
+    posOrder(raiz->esquerda);
+    posOrder(raiz->direita);
+    printf("%i ", raiz->valor);
+  }
+}
+
+// Função auxiliar para verificar se o valor de entrada é inteiro
+int verificaEntrada() {
+  int ehValido, valor;
+  while (1) {
+    ehValido = scanf("%i", &valor);
+    if (ehValido == 1) {
+      if (valor < 0) { // Não permitir valores negativos
+        printf("\nValor inválido.\nTente novamente: ");
+        while (getchar() != '\n')
+          ; // Limpar a entrada
+      } else {
+        break;
+      }
+    } else {
+      printf("\nValor inválido.\nTente novamente: ");
+      while (getchar() != '\n')
+        ; // Limpar a entrada
+    }
+  }
+
+  return valor;
 }
 
 // -=-=-=-=-=- FUNÇÕES DO PROGRAMA -=-=-=-=-=-
@@ -116,62 +159,74 @@ struct Node *excluirNo(struct Node *raiz, int valor) {
 
 // -=-=-=-=-=- PROGRAMA PRINCIPAL -=-=-=-=-=-
 int main() {
-  struct Node *raiz = NULL;
+  struct Node *raiz = NULL; // Alocando espaço para a raiz/árvore
 
-  int n = 0;
-  printf("Digite a quantidade de nós a serem adicionados: ");
-  scanf("%i", &n);
-
-  while (n > 0) {
-    int num = 0;
-    printf("Digite um valor: ");
-    scanf("%i", &num);
-    raiz = inserirNo(raiz, num);
-    n--;
-  }
-
-  int opcao = -1;
-  int valor;
-  while (opcao != 0) {
+  int opcao, valor;
+  do {
     printf("\n-=-=-=-=-=- MENU -=-=-=-=-=-=-");
-    printf("\n\n[1] Procurar um elemento na árvore");
-    printf("\n[2] Excluir um elemento da árvore");
-    printf("\n[3] Exibir a árvore");
-    printf("\n\n[0] Sair do programa");
-    printf("\nDigite a sua opção: ");
-    scanf("%i", &opcao);
+    printf("\n\n[1] Inserir um elemento na árvore");
+    printf("\n[2] Procurar um elemento na árvore");
+    printf("\n[3] Excluir um elemento da árvore");
+    printf("\n[4] Exibir a árvore");
+    printf("\n[0] Sair do programa");
+    printf("\n\nDigite a sua opção: ");
+
+    opcao = verificaEntrada();
 
     switch (opcao) {
     case 1:
+      printf("\n-=-=-=-=-=- INSERIR NÓ -=-=-=-=-=-");
+      int n = 0;
+      printf("\nDigite a quantidade de nós a serem adicionados: ");
+      n = verificaEntrada();
+
+      while (n > 0) {
+        int num = 0;
+        printf("\nDigite um valor: ");
+        num = verificaEntrada();
+        raiz = inserirNo(raiz, num);
+        n--;
+      }
+      break;
+
+    case 2:
       printf("\n-=-=-=-=-=- PROCURAR NÓ -=-=-=-=-=-");
       printf("\nDigite um valor a ser procurado: ");
       scanf("%i", &valor);
       procurarNo(raiz, valor);
       break;
 
-    case 2:
+    case 3:
       printf("\n-=-=-=-=-=- EXCLUIR NÓ -=-=-=-=-=-");
       printf("\nDigite um valor a ser excluído: ");
       scanf("%i", &valor);
       raiz = excluirNo(raiz, valor);
       break;
 
-    case 3:
-      printf("\n-=-=-=-=-=- EXIBIR ÁRVORE -=-=-=-=-=-");
-      exibirArvore(raiz);
+    case 4:
+      printf("\n-=-=-=-=-=- EXIBIR ÁRVORE -=-=-=-=-=-\n");
+      printf("\nPRE-ORDER: ");
+      preOrder(raiz);
+
+      printf("\nIN-ORDER: ");
+      inOrder(raiz);
+
+      printf("\nPOS-ORDER: ");
+      posOrder(raiz);
+      printf("\n");
       break;
 
     case 0:
       printf("\n-=-=-=-=-=- SAIR DO PROGRAMA -=-=-=-=-=-");
       printf("\nAté mais!!");
+      free(raiz);
       break;
 
     default:
       printf("\nValor Inválido. Tente novamente.");
-      opcao = -1;
       break;
     }
-  }
+  } while (opcao != 0);
 
   return 0;
 }
