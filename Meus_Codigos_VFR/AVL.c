@@ -86,6 +86,22 @@ int verificaEntrada() {
   return valor;
 }
 
+// Função para retornar a altura de um nó
+int alturaNo(struct NoAVL *no){
+    if (no == NULL){
+        return -1;
+    }
+    return no->altura;
+}
+
+// Função para indicar o fator de balanceamento
+int fatorBalanceamento(struct NoAVL *no){
+    if (no == NULL){
+        return 0;
+    }
+    return alturaNo(no->esquerda) - alturaNo(no->direita);
+}
+
 // -=-=-=-=-=- FUNÇÕES DO PROGRAMA -=-=-=-=-=-
 // Função para criar um novo Nó
 struct NoAVL *criarNo(int valor) {
@@ -100,6 +116,54 @@ struct NoAVL *criarNo(int valor) {
   novoNo->esquerda = NULL;
   novoNo->altura = 0;
   return novoNo;
+}
+
+// Função para realizar a RSD (Rotação Simples Direita)
+struct NoAVL *rotacaoDireita(struct NoAVL *no)
+{
+  struct NoAVL *novaRaiz = no->esquerda;
+  struct NoAVL *subArvore = novaRaiz->direita;
+    
+  // Realiza a rotação
+  novaRaiz->direita = no;
+  no->esquerda = subArvore;
+
+  // Atualiza as alturas
+  if (altura(no->esquerda) > altura(no->direita))
+    no->altura = 1 + altura(no->esquerda);
+  else
+    no->altura = 1 + altura(no->direita);
+
+  if (altura(novaRaiz->esquerda) > altura(novaRaiz->direita))
+    novaRaiz->altura = 1 + altura(novaRaiz->esquerda);
+  else
+    novaRaiz->altura = 1 + altura(novaRaiz->direita);
+
+  return novaRaiz;
+}
+
+// Função para realizar a RSE (Rotação Simples Esquerda)
+struct NoAVL *rotacaoEsquerda(struct NoAVL *no)
+{
+  struct NoAVL *novaRaiz = no->direita;
+  struct NoAVL *subArvore = novaRaiz->esquerda;
+
+  // Realiza a rotação
+  novaRaiz->esquerda = no;
+  no->direita = subArvore;
+
+  // Atualiza as alturas
+  if (altura(no->esquerda) > altura(no->direita))
+    no->altura = 1 + altura(no->esquerda);
+  else
+    no->altura = 1 + altura(no->direita);
+
+  if (altura(novaRaiz->esquerda) > altura(novaRaiz->direita))
+    novaRaiz->altura = 1 + altura(novaRaiz->esquerda);
+  else
+    novaRaiz->altura = 1 + altura(novaRaiz->direita);
+
+  return novaRaiz;
 }
 
 // Função para balancear uma árvore
