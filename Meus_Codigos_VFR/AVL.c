@@ -92,7 +92,40 @@ int fatorBalanceamento(struct NoAVL *no) {
   if (no == NULL) {
     return 0;
   }
-  return no->esquerda->altura - no->direita->altura;
+  int alturaEsquerda, alturaDireita;
+  if (no->esquerda == NULL) {
+    alturaEsquerda = -1;
+  } else {
+    alturaEsquerda = no->esquerda->altura;
+  }
+  if (no->direita == NULL) {
+    alturaDireita = -1;
+  } else {
+    alturaDireita = no->direita->altura;
+  }
+  return (alturaEsquerda - alturaDireita);
+}
+
+// Função para atualizar a altura do nó
+void atualizarAltura(struct NoAVL *no) {
+  int alturaEsquerda, alturaDireita;
+
+  if (no->esquerda == NULL) {
+    alturaEsquerda = -1;
+  } else {
+    alturaEsquerda = no->esquerda->altura;
+  }
+  if (no->direita == NULL) {
+    alturaDireita = -1;
+  } else {
+    alturaDireita = no->direita->altura;
+  }
+
+  if (alturaEsquerda > alturaDireita) {
+    no->altura = alturaEsquerda;
+  } else {
+    no->altura = alturaDireita + 1;
+  }
 }
 
 // -=-=-=-=-=- FUNÇÕES DO PROGRAMA -=-=-=-=-=-
@@ -121,17 +154,8 @@ struct NoAVL *rotacaoDireita(struct NoAVL *no) {
   no->esquerda = subArvore;
 
   // Atualiza as alturas
-  if (no->esquerda->altura > no->direita->altura) {
-    no->altura = no->esquerda->altura + 1;
-  } else {
-    no->altura = no->direita->altura + 1;
-  }
-
-  if (novaRaiz->esquerda->altura > novaRaiz->direita->altura) {
-    novaRaiz->altura = novaRaiz->esquerda->altura + 1;
-  } else {
-    novaRaiz->altura = novaRaiz->direita->altura + 1;
-  }
+  atualizarAltura(no);
+  atualizarAltura(novaRaiz);
 
   return novaRaiz;
 }
@@ -146,55 +170,42 @@ struct NoAVL *rotacaoEsquerda(struct NoAVL *no) {
   no->direita = subArvore;
 
   // Atualiza as alturas
-  if (no->esquerda->altura > no->direita->altura) {
-    no->altura = no->esquerda->altura + 1;
-  } else {
-    no->altura = no->direita->altura + 1;
-  }
-
-  if (novaRaiz->esquerda->altura > novaRaiz->direita->altura) {
-    novaRaiz->altura = novaRaiz->esquerda->altura + 1;
-  } else {
-    novaRaiz->altura = novaRaiz->direita->altura + 1;
-  }
+  atualizarAltura(no);
+  atualizarAltura(novaRaiz);
 
   return novaRaiz;
 }
 
 // Função para balancear a árvore
-struct NoAVL *balancearArvore(struct NoAVL *raiz, int dado) {
+struct NoAVL *balancearArvore(struct NoAVL *raiz, int valor) {
   // Atualiza a altura do nó atual
   if (raiz == NULL) {
     return raiz;
   }
-  if (raiz->esquerda->altura > raiz->direita->altura) {
-    raiz->altura = raiz->esquerda->altura + 1;
-  } else {
-    raiz->altura = raiz->direita->altura + 1;
-  }
+  atualizarAltura(raiz);
 
   // Calcula o fator de balanceamento deste nó para verificar se ele se tornou
   // desbalanceado
   int balanceamento = fatorBalanceamento(raiz);
 
   // Caso de desbalanceamento à esquerda-esquerda
-  if (balanceamento > 1 && dado < raiz->esquerda->valor) {
+  if (balanceamento > 1 && valor < raiz->esquerda->valor) {
     return rotacaoDireita(raiz);
   }
 
   // Caso de desbalanceamento à direita-direita
-  if (balanceamento < -1 && dado > raiz->direita->valor) {
+  if (balanceamento < -1 && valor > raiz->direita->valor) {
     return rotacaoEsquerda(raiz);
   }
 
   // Caso de desbalanceamento à esquerda-direita
-  if (balanceamento > 1 && dado > raiz->esquerda->valor) {
+  if (balanceamento > 1 && valor > raiz->esquerda->valor) {
     raiz->esquerda = rotacaoEsquerda(raiz->esquerda);
     return rotacaoDireita(raiz);
   }
 
   // Caso de desbalanceamento à direita-esquerda
-  if (balanceamento < -1 && dado < raiz->direita->valor) {
+  if (balanceamento < -1 && valor < raiz->direita->valor) {
     raiz->direita = rotacaoDireita(raiz->direita);
     return rotacaoEsquerda(raiz);
   }
@@ -280,11 +291,10 @@ int alturaArvore(struct NoAVL *raiz) {
   if (raiz == NULL) {
     return -1;
   }
-
   int alturaEsquerda = alturaArvore(raiz->esquerda) + 1;
   int alturaDireita = alturaArvore(raiz->direita) + 1;
 
-  if (alturaDireita < alturaEsquerda) {
+  if (alturaEsquerda > alturaDireita) {
     return alturaEsquerda;
   } else {
     return alturaDireita;
@@ -341,7 +351,7 @@ int main() {
     case 4:
       printf("\n-=-=-=-=-=- ALTURA DA ÁRVORE -=-=-=-=-=-");
       int altura = alturaArvore(raiz);
-      printf("\nA altura da árvore é: %i", altura);
+      printf("\nA altura da árvore é: %i\n", altura);
       break;
 
     case 5:
