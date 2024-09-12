@@ -27,7 +27,8 @@ struct NoAVL *encontrarMinimo(struct NoAVL *raiz) {
   return atual;
 }
 
-// Função auxiliar para encontrar o valor máximo do nó mais à direita do lado equerdo
+// Função auxiliar para encontrar o valor máximo do nó mais à direita do lado
+// equerdo
 struct NoAVL *encontrarMaximo(struct NoAVL *raiz) {
   struct NoAVL *atual = raiz;
   while (atual->direita != NULL) {
@@ -86,20 +87,12 @@ int verificaEntrada() {
   return valor;
 }
 
-// Função para retornar a altura de um nó
-int alturaNo(struct NoAVL *no){
-    if (no == NULL){
-        return -1;
-    }
-    return no->altura;
-}
-
 // Função para indicar o fator de balanceamento
-int fatorBalanceamento(struct NoAVL *no){
-    if (no == NULL){
-        return 0;
-    }
-    return alturaNo(no->esquerda) - alturaNo(no->direita);
+int fatorBalanceamento(struct NoAVL *no) {
+  if (no == NULL) {
+    return 0;
+  }
+  return no->esquerda->altura - no->direita->altura;
 }
 
 // -=-=-=-=-=- FUNÇÕES DO PROGRAMA -=-=-=-=-=-
@@ -119,56 +112,94 @@ struct NoAVL *criarNo(int valor) {
 }
 
 // Função para realizar a RSD (Rotação Simples Direita)
-struct NoAVL *rotacaoDireita(struct NoAVL *no)
-{
+struct NoAVL *rotacaoDireita(struct NoAVL *no) {
   struct NoAVL *novaRaiz = no->esquerda;
   struct NoAVL *subArvore = novaRaiz->direita;
-    
-  // Realiza a rotação
+
+  // Faz a RSD
   novaRaiz->direita = no;
   no->esquerda = subArvore;
 
   // Atualiza as alturas
-  if (altura(no->esquerda) > altura(no->direita))
-    no->altura = 1 + altura(no->esquerda);
-  else
-    no->altura = 1 + altura(no->direita);
+  if (no->esquerda->altura > no->direita->altura) {
+    no->altura = no->esquerda->altura + 1;
+  } else {
+    no->altura = no->direita->altura + 1;
+  }
 
-  if (altura(novaRaiz->esquerda) > altura(novaRaiz->direita))
-    novaRaiz->altura = 1 + altura(novaRaiz->esquerda);
-  else
-    novaRaiz->altura = 1 + altura(novaRaiz->direita);
+  if (novaRaiz->esquerda->altura > novaRaiz->direita->altura) {
+    novaRaiz->altura = novaRaiz->esquerda->altura + 1;
+  } else {
+    novaRaiz->altura = novaRaiz->direita->altura + 1;
+  }
 
   return novaRaiz;
 }
 
 // Função para realizar a RSE (Rotação Simples Esquerda)
-struct NoAVL *rotacaoEsquerda(struct NoAVL *no)
-{
+struct NoAVL *rotacaoEsquerda(struct NoAVL *no) {
   struct NoAVL *novaRaiz = no->direita;
   struct NoAVL *subArvore = novaRaiz->esquerda;
 
-  // Realiza a rotação
+  // Faz a RSE
   novaRaiz->esquerda = no;
   no->direita = subArvore;
 
   // Atualiza as alturas
-  if (altura(no->esquerda) > altura(no->direita))
-    no->altura = 1 + altura(no->esquerda);
-  else
-    no->altura = 1 + altura(no->direita);
+  if (no->esquerda->altura > no->direita->altura) {
+    no->altura = no->esquerda->altura + 1;
+  } else {
+    no->altura = no->direita->altura + 1;
+  }
 
-  if (altura(novaRaiz->esquerda) > altura(novaRaiz->direita))
-    novaRaiz->altura = 1 + altura(novaRaiz->esquerda);
-  else
-    novaRaiz->altura = 1 + altura(novaRaiz->direita);
+  if (novaRaiz->esquerda->altura > novaRaiz->direita->altura) {
+    novaRaiz->altura = novaRaiz->esquerda->altura + 1;
+  } else {
+    novaRaiz->altura = novaRaiz->direita->altura + 1;
+  }
 
   return novaRaiz;
 }
 
-// Função para balancear uma árvore
-struct NoAVL *balancearArvore(struct *NoAVL raiz, valor){
-    
+// Função para balancear a árvore
+struct NoAVL *balancearArvore(struct NoAVL *raiz, int dado) {
+  // Atualiza a altura do nó atual
+  if (raiz == NULL) {
+    return raiz;
+  }
+  if (raiz->esquerda->altura > raiz->direita->altura) {
+    raiz->altura = raiz->esquerda->altura + 1;
+  } else {
+    raiz->altura = raiz->direita->altura + 1;
+  }
+
+  // Calcula o fator de balanceamento deste nó para verificar se ele se tornou
+  // desbalanceado
+  int balanceamento = fatorBalanceamento(raiz);
+
+  // Caso de desbalanceamento à esquerda-esquerda
+  if (balanceamento > 1 && dado < raiz->esquerda->valor) {
+    return rotacaoDireita(raiz);
+  }
+
+  // Caso de desbalanceamento à direita-direita
+  if (balanceamento < -1 && dado > raiz->direita->valor) {
+    return rotacaoEsquerda(raiz);
+  }
+
+  // Caso de desbalanceamento à esquerda-direita
+  if (balanceamento > 1 && dado > raiz->esquerda->valor) {
+    raiz->esquerda = rotacaoEsquerda(raiz->esquerda);
+    return rotacaoDireita(raiz);
+  }
+
+  // Caso de desbalanceamento à direita-esquerda
+  if (balanceamento < -1 && dado < raiz->direita->valor) {
+    raiz->direita = rotacaoDireita(raiz->direita);
+    return rotacaoEsquerda(raiz);
+  }
+
+  return raiz;
 }
 
 // Função para inserir um novo Nó
@@ -177,13 +208,15 @@ struct NoAVL *inserirNo(struct NoAVL *raiz, int valor) {
   {
     return criarNo(valor);
   } else {
-    if (valor <= raiz->valor) {
+    if (valor < raiz->valor) {
       raiz->esquerda = inserirNo(raiz->esquerda, valor);
-    } else {
+    } else if (valor > raiz->valor) {
       raiz->direita = inserirNo(raiz->direita, valor);
+    } else {
+      return raiz; // Não podem ter entradas iguais na árvore
     }
   }
-  return raiz;
+  return balancearArvore(raiz, valor);
 }
 
 // Função para procurar um Nó
@@ -228,29 +261,34 @@ struct NoAVL *excluirNo(struct NoAVL *raiz, int valor) {
       return temp;
     }
 
-    // 2º Caso: Nó com filhos
-    struct NoAVL *temp = encontrarMinimo(raiz->direita);
-    raiz->valor = temp->valor;
-    raiz->direita = excluirNo(raiz->direita, temp->valor);
-    printf("Elemento %d excluído\n", valor);
+    // 2º Caso: Nó com dois filhos
+    if (raiz->esquerda->altura >= raiz->direita->altura) {
+      struct NoAVL *temp = encontrarMinimo(raiz->direita);
+      raiz->valor = temp->valor;
+      raiz->esquerda = excluirNo(raiz->esquerda, temp->valor);
+    } else {
+      struct NoAVL *temp = encontrarMinimo(raiz->esquerda);
+      raiz->valor = temp->valor;
+      raiz->direita = excluirNo(raiz->direita, temp->valor);
+    }
   }
-  return raiz;
+  return balancearArvore(raiz, valor);
 }
 
 // Função para calcular a altura da árvore
-int alturaArvore(struct *NoAVL raiz){
-    if (raiz == NULL){
-        return -1;
-    }
-    
-    int alturaEsquerda = alturaArvore(raiz->esquerda) + 1;
-    int alturaDireita = alturaArvore(raiz->direita) + 1;
-    
-    if (alturaDireita < alturaEsquerda){
-        return alturaEsquerda;
-    } else {
-        return alturaDireita;
-    }
+int alturaArvore(struct NoAVL *raiz) {
+  if (raiz == NULL) {
+    return -1;
+  }
+
+  int alturaEsquerda = alturaArvore(raiz->esquerda) + 1;
+  int alturaDireita = alturaArvore(raiz->direita) + 1;
+
+  if (alturaDireita < alturaEsquerda) {
+    return alturaEsquerda;
+  } else {
+    return alturaDireita;
+  }
 }
 
 // -=-=-=-=-=- PROGRAMA PRINCIPAL -=-=-=-=-=-
@@ -263,7 +301,8 @@ int main() {
     printf("\n\n[1] Inserir um elemento na árvore");
     printf("\n[2] Procurar um elemento na árvore");
     printf("\n[3] Excluir um elemento da árvore");
-    printf("\n[4] Exibir a árvore");
+    printf("\n[4] Calcular a altura da árvore");
+    printf("\n[5] Exibir a árvore");
     printf("\n[0] Sair do programa");
     printf("\n\nDigite a sua opção: ");
 
@@ -300,6 +339,12 @@ int main() {
       break;
 
     case 4:
+      printf("\n-=-=-=-=-=- ALTURA DA ÁRVORE -=-=-=-=-=-");
+      int altura = alturaArvore(raiz);
+      printf("\nA altura da árvore é: %i", altura);
+      break;
+
+    case 5:
       printf("\n-=-=-=-=-=- EXIBIR ÁRVORE -=-=-=-=-=-\n");
       printf("\nPRE-ORDER: ");
       preOrder(raiz);
