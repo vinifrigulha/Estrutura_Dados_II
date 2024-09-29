@@ -188,11 +188,31 @@ void procurarNo(struct NoRB *raiz, int valor) {
     if (valor == raiz->valor) {
       printf("O valor %d foi encontrado!\n\n", valor);
     } else if (valor < raiz->valor) {
-      printf("O valor %d é menor que %d\n", valor, raiz->valor);
       procurarNo(raiz->esquerda, valor);
     } else if (valor > raiz->valor) {
-      printf("O valor %d é maior que %d\n", valor, raiz->valor);
       procurarNo(raiz->direita, valor);
+    }
+    return;
+  }
+}
+
+// Função para retornar a cor do nó procurado
+void corNo(struct NoRB *raiz, int valor) {
+  if (raiz == NULL) // Verificando se a raiz é NULL
+  {
+    printf("Elemento %d não encontrado.\n\n", valor);
+    return;
+  } else {
+    if (valor == raiz->valor) {
+      if (raiz->cor == 0){
+        printf("A cor do nó %d é VERMELHA\n\n", valor);
+      } else {
+        printf("A cor do nó %d é PRETA\n\n", valor);
+      }
+    } else if (valor < raiz->valor) {
+      corNo(raiz->esquerda, valor);
+    } else if (valor > raiz->valor) {
+      corNo(raiz->direita, valor);
     }
     return;
   }
@@ -259,8 +279,9 @@ int main() {
 
     case 3:
       printf("\n-=-=-=-=-=- COR DO NÓ -=-=-=-=-=-");
-      int altura = alturaArvore(raiz);
-      printf("\nA altura da árvore é: %i\n", altura);
+      printf("\nDigite um valor a ser procurado: ");
+      scanf("%i", &valor);
+      corNo(raiz, valor);
       break;
 
     case 4:
