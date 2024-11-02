@@ -74,26 +74,28 @@ struct NoTreap *criarNo(int valor) {
 
 // Função para inserir um nó
 struct NoTreap *inserirNo(struct NoTreap *raiz, int valor) {
-    // Inserção na posição de árvore binária de busca
-    if (raiz == NULL)
-        return criarNo(valor);
+  // Inserção na posição de árvore binária de busca
+  if (raiz == NULL)
+    return criarNo(valor);
 
-    if (valor < raiz->valor) {
-        raiz->esquerda = inserirNo(raiz->esquerda, valor);
+  if (valor < raiz->valor) {
+    raiz->esquerda = inserirNo(raiz->esquerda, valor);
 
-        // Realizar rotação de acordo com a prioridade para manter a propriedade de heap
-        if (raiz->esquerda->prioridade > raiz->prioridade)
-            raiz = rotacaoDireita(raiz);
+    // Realizar rotação de acordo com a prioridade para manter a propriedade de
+    // heap
+    if (raiz->esquerda->prioridade > raiz->prioridade)
+      raiz = rotacaoDireita(raiz);
 
-    } else {
-        raiz->direita = inserirNo(raiz->direita, valor);
+  } else {
+    raiz->direita = inserirNo(raiz->direita, valor);
 
-        // Realizar rotação de acordo com a prioridade para manter a propriedade de heap
-        if (raiz->direita->prioridade > raiz->prioridade)
-            raiz = rotacaoEsquerda(raiz);
-    }
+    // Realizar rotação de acordo com a prioridade para manter a propriedade de
+    // heap
+    if (raiz->direita->prioridade > raiz->prioridade)
+      raiz = rotacaoEsquerda(raiz);
+  }
 
-    return raiz;
+  return raiz;
 }
 
 // Função para excluir um Nó
@@ -107,7 +109,7 @@ struct NoTreap *excluirNo(struct NoTreap *raiz, int valor) {
     raiz->esquerda = excluirNo(raiz->esquerda, valor);
   else if (valor > raiz->valor)
     raiz->direita = excluirNo(raiz->direita, valor);
-  else { 
+  else {
     // Encontrou o nó
     printf("Elemento %d excluído com sucesso.\n\n", valor);
     if (raiz->esquerda == NULL) {
@@ -162,7 +164,6 @@ void exibeArvore(struct NoTreap *raiz, int h) {
     exibeArvore(raiz->esquerda, h + 1);
   }
 }
-
 
 // -=-=-=-=-=- PROGRAMA PRINCIPAL -=-=-=-=-=- //
 int main() {
